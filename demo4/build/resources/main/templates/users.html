@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Користувачі</title>
+</head>
+<body>
+<h1>Список користувачів</h1>
+<table border="1">
+  <tr>
+    <th>Ім'я</th>
+    <th>Роль</th>
+    <th>Дії</th>
+  </tr>
+  <tr th:each="entry : ${users}">
+    <td th:text="${entry.key}"></td>
+    <td th:text="${entry.value}"></td>
+    <td>
+      <form th:action="@{/users/delete/{username}(username=${entry.key})}" method="post">
+        <button type="submit">Видалити</button>
+      </form>
+    </td>
+  </tr>
+</table>
+
+<h2>Додати користувача</h2>
+<form th:action="@{/users/add}" th:object="${user}" method="post">
+  <input type="text" th:field="*{username}" placeholder="Ім'я користувача">
+  <span style="color: red" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
+  <button type="submit">Додати</button>
+</form>
+</body>
+</html>
