@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Управління доступом</title>
+</head>
+<body>
+<nav>
+    <a href="/users">Користувачі</a> |
+    <a href="/access">Управління доступом</a> |
+    <a href="/admin">Адмін панель</a> |
+    <a href="/logout">Вийти</a>
+</nav>
+
+<h1>Призначення ролей</h1>
+<form th:action="@{/access/assign-role}" method="post">
+    <input type="text" name="username" placeholder="Ім'я користувача" required>
+    <select name="role">
+        <option value="USER">USER</option>
+        <option value="ADMIN">ADMIN</option>
+    </select>
+    <button type="submit">Призначити роль</button>
+</form>
+
+<h2>Список користувачів</h2>
+<table border="1">
+    <tr>
+        <th>Користувач</th>
+        <th>Роль</th>
+    </tr>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.username}"></td>
+        <td th:text="${user.role != null ? user.role.name : 'Не призначено'}"></td>
+    </tr>
+</table>
+</body>
+</html>

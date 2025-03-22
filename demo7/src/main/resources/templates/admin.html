@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Панель Адміністратора</title>
+</head>
+<body>
+<nav>
+  <a href="/users">Користувачі</a> |
+  <a href="/access">Управління доступом</a> |
+  <a href="/admin">Адмін панель</a> |
+  <a href="/logout">Вийти</a>
+</nav>
+<h1>Адміністративна Панель</h1>
+
+<!-- Список користувачів -->
+<h2>Список користувачів</h2>
+<table border="1">
+  <tr>
+    <th>ID</th>
+    <th>Ім'я</th>
+    <th>Роль</th>
+    <th>Дії</th>
+  </tr>
+  <tr th:each="user : ${users}">
+    <td th:text="${user.id}"></td>
+    <td th:text="${user.username}"></td>
+    <td th:text="${user.role != null ? user.role.name : 'Не призначено'}"></td>
+    <td>
+      <form th:action="@{/admin/delete/{id}(id=${user.id})}" method="post">
+        <button type="submit">Видалити</button>
+      </form>
+    </td>
+  </tr>
+</table>
+
+<!-- Форма для призначення ролей -->
+<h2>Призначити роль користувачу</h2>
+<form th:action="@{/admin/assign-role}" method="post">
+  <input type="text" name="username" placeholder="Ім'я користувача" required>
+  <select name="role">
+    <option value="USER">USER</option>
+    <option value="ADMIN">ADMIN</option>
+  </select>
+  <button type="submit">Призначити роль</button>
+</form>
+
+<br>
+<a href="/users">Перейти до списку користувачів</a>
+</body>
+</html>
