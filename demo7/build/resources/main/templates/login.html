@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Авторизація</title>
+</head>
+<body>
+<h1>Авторизація</h1>
+<form th:action="@{/login}" method="post">
+    <input type="text" name="username" placeholder="Ім'я користувача" required>
+    <input type="password" name="password" placeholder="Пароль" required>
+    <button type="submit">Увійти</button>
+</form>
+<a href="/register">Зареєструватися</a>
+</body>
+</html>
