@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Список користувачів</title>
+</head>
+<body>
+<nav>
+  <a href="/users">Користувачі</a> |
+  <a href="/access">Управління доступом</a> |
+  <a href="/admin">Адмін панель</a> |
+  <a href="/logout">Вийти</a>
+</nav>
+
+<h1>Список користувачів</h1>
+<table border="1">
+  <tr>
+    <th>Ім'я</th>
+    <th>Роль</th>
+    <th>Дії</th>
+  </tr>
+  <tr th:each="user : ${users}">
+    <td>
+      <form th:action="@{/users/update}" method="post">
+        <input type="hidden" name="id" th:value="${user.id}">
+        <input type="text" name="username" th:value="${user.username}" required>
+        <select name="role">
+          <option value="USER" th:selected="${user.role != null and user.role.name == 'USER'}">USER</option>
+          <option value="ADMIN" th:selected="${user.role != null and user.role.name == 'ADMIN'}">ADMIN</option>
+        </select>
+        <button type="submit">Оновити</button>
+      </form>
+    </td>
+    <td th:text="${user.role != null ? user.role.name : 'Не призначено'}"></td>
+    <td>
+      <form th:action="@{/users/delete/{id}(id=${user.id})}" method="post">
+        <button type="submit">Видалити</button>
+      </form>
+    </td>
+  </tr>
+</table>
+
+<h2>Додати користувача</h2>
+<form th:action="@{/users/add}" method="post">
+  <input type="text" name="username" placeholder="Ім'я користувача" required>
+  <input type="password" name="password" placeholder="Пароль" required>
+  <select name="role">
+    <option value="USER">USER</option>
+    <option value="ADMIN">ADMIN</option>
+  </select>
+  <button type="submit">Додати</button>
+</form>
+</body>
+</html>

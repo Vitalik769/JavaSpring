@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Управління доступом</title>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        nav a {
+            margin-right: 10px;
+        }
+        #aspect-messages {
+            background: #f0f8ff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        .msg {
+            padding: 4px 0;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/users">Користувачі</a> |
+    <a href="/access">Управління доступом</a> |
+    <a href="/admin">Адмін панель</a> |
+    <a href="/logout">Вийти</a>
+</nav>
+
+<h1>Призначення ролей</h1>
+<form id="role-form">
+    <input type="text" name="username" placeholder="Ім'я користувача" required>
+    <select name="role">
+        <option value="USER">USER</option>
+        <option value="ADMIN">ADMIN</option>
+    </select>
+    <button type="submit">Призначити роль</button>
+</form>
+
+<h2>Список користувачів</h2>
+<table border="1">
+    <tr>
+        <th>Користувач</th>
+        <th>Роль</th>
+    </tr>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.username}"></td>
+        <td th:text="${user.role != null ? user.role.name : 'Не призначено'}"></td>
+    </tr>
+</table>
+
+<h2>Повідомлення від аспектів</h2>
+<div id="aspect-messages">
+    <div><strong>Очікування повідомлень...</strong></div>
+</div>
+
+<script>
+    // WebSocket STOMP
+    const socket = new SockJS('/ws');
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
+        console.log('✅ WebSocket підключено:', frame);
+
+        stompClient.subscribe('/topic/userroleaspect', function (message) {
+            showMessage("USERROLE", message.body, 'success');
+        });
+
+        stompClient.subscribe('/topic/accesscontroller', function (message) {
+            showMessage("ACCESSCTRL", message.body, 'success');
+        });
+    });
+
+    function showMessage(source, text, type) {
+        const msg = document.createElement('div');
+        msg.className = "msg " + (type || '');
+        msg.textContent = "🔔 [" + source + "] " + text;
+        document.getElementById('aspect-messages').appendChild(msg);
+    }
+
+    // AJAX обробка форми (без перезавантаження)
+    document.getElementById('role-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+        fetch('/access/assign-role', {
+            method: 'POST',
+            body: new URLSearchParams(formData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    showMessage("FORM", "Роль призначено успішно.", 'success');
+                } else {
+                    showMessage("FORM", "Помилка при призначенні ролі.", 'error');
+                }
+            })
+            .catch(error => {
+                showMessage("FORM", "Виняток: " + error, 'error');
+            });
+    });
+</script>
+
+</body>
+</html>
